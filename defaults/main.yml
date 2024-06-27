@@ -1,2 +1,4 @@
 ---
+ROCM_APT_REPO_KEY_FILE: "/etc/apt/sources.d/rocm.gpg" 
+ROCM_APT_KEY_ID: "9386B48A1A693C5C"
 
