@@ -1,0 +1,40 @@
+---
+
+- name: "Adding AMD ROCm apt key"
+  apt_key:
+    url: "https://repo.radeon.com/rocm/rocm.gpg.key"
+    keyring: "{{ ROCM_APT_REPO_KEY_FILE }}"
+    id: "{{ ROCM_APT_KEY_ID }}"
+  when: ansible_os_family == "Debian"
+
+- name: "Adding AMD ROCm repo"
+  copy:
+    dest: "/etc/apt/sources.list.d/amdgpu.list"
+    content: |
+      deb [arch=amd64 signed-by={{ ROCM_APT_REPO_KEY_FILE }} ] https://repo.radeon.com/amdgpu/{{ ROCM_VERSION }}/ubuntu jammy main
+      deb [arch=amd64 signed-by={{ ROCM_APT_REPO_KEY_FILE }} ] https://repo.radeon.com/rocm/apt/{{ ROCM_VERSION}} jammy main
+    mode: "644"
+    owner: "root"
+    group: "root"
+  when: (ansible_lsb.codename is defined) and ("ansible_lsb.codename in lookup('vars','ubuntu_22_04_codenames')")
+
+- name: "Setting Priorities to ROCm repo"
+  copy:
+    dest: "/etc/apt/preferences.d/rocm-pin-600"
+    content: |
+      Package: *\nPin: release o=repo.radeon.com\nPin-Priority: 600
+  when: ansible_os_family == "Debian"
+
+- name: "Installed dependencies"
+  apt:
+    name:
+      - python3
+      - python3-venv
+      - google-perftools
+      - git
+      - amdgpu-dkms
+      - rocm-hip-libraries
+    state: present
+    update_cache: true
+  when: ansible_os_family == "Debian"
+
