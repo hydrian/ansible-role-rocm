@@ -1,0 +1,3 @@
+---
+rocm_apt_keyring_dir: '/etc/apt/keyrings'
+rocm_apt_repo_key_file: "{{ rocm_apt_keyring_dir }}/rocm.gpg"
